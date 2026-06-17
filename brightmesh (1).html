@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>BrightMesh</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;-webkit-tap-highlight-color:transparent;}
+body{background:#0d0d0f;color:#fff;min-height:100vh;overflow-x:hidden;}
+:root{
+  --bg:#0d0d0f;--bg2:#1a1a1c;--bg3:#2c2c2a;
+  --border:#2c2c2a;--text:#fff;--text2:#D3D1C7;--text3:#888780;--text4:#5F5E5A;
+  --primary:#7F77DD;--primary2:#26215C;
+  --green:#1D9E75;--red:#E24B4A;--orange:#D85A30;--yellow:#FAC775;--pink:#D4537E;
+}
+#app{max-width:480px;margin:0 auto;min-height:100vh;position:relative;}
+
+/* ---- TOPBAR ---- */
+#topbar{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;position:sticky;top:0;background:var(--bg);z-index:100;border-bottom:0.5px solid var(--border);}
+.logo{font-size:20px;font-weight:800;color:var(--primary);}
+.topIcons{display:flex;gap:10px;align-items:center;}
+.iconCircle{width:34px;height:34px;background:var(--bg2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;position:relative;}
+.badge{position:absolute;top:-2px;right:-2px;width:16px;height:16px;background:var(--red);border-radius:50%;font-size:9px;display:flex;align-items:center;justify-content:center;font-weight:700;}
+
+/* ---- STORIES ---- */
+#storiesWrap{display:flex;gap:8px;overflow-x:auto;padding:10px 14px;scrollbar-width:none;}
+#storiesWrap::-webkit-scrollbar{display:none;}
+.storyCard{flex-shrink:0;width:64px;text-align:center;cursor:pointer;}
+.storyRing{width:60px;height:60px;border-radius:50%;padding:2px;background:linear-gradient(135deg,var(--primary),var(--pink));display:flex;align-items:center;justify-content:center;}
+.storyRing.add{background:var(--bg3);}
+.storyAvatar{width:54px;height:54px;border-radius:50%;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;overflow:hidden;border:2px solid var(--bg);}
+.storyAvatar img{width:100%;height:100%;object-fit:cover;}
+.storyName{font-size:10px;color:var(--text3);margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+/* ---- COMPOSER BAR ---- */
+#composerBar{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:6px solid var(--bg3);}
+.composerAvatar{width:38px;height:38px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:var(--primary2);flex-shrink:0;overflow:hidden;}
+.composerAvatar img{width:100%;height:100%;object-fit:cover;}
+.composerInput{flex:1;background:var(--bg3);border:none;border-radius:20px;padding:10px 16px;color:var(--text3);font-size:14px;cursor:pointer;text-align:left;}
+.composerActions{display:flex;gap:6px;padding:8px 14px 12px;border-bottom:6px solid var(--bg3);}
+.compAct{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;}
+.compAct:hover{background:var(--bg3);}
+
+/* ---- TABS ---- */
+#feedTabs{display:flex;border-bottom:0.5px solid var(--border);position:sticky;top:52px;background:var(--bg);z-index:99;}
+.feedTab{flex:1;padding:12px 0;text-align:center;font-size:13px;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;}
+.feedTab.active{color:var(--primary);border-bottom:2px solid var(--primary);font-weight:600;}
+
+/* ---- FEED ---- */
+#feed{padding-bottom:70px;}
+.post{background:var(--bg);margin-bottom:8px;border-top:0.5px solid var(--border);border-bottom:0.5px solid var(--border);}
+.postHead{display:flex;align-items:flex-start;gap:10px;padding:12px 14px 8px;}
+.postAvatar{width:40px;height:40px;border-radius:50%;flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;cursor:pointer;}
+.postAvatar img{width:100%;height:100%;object-fit:cover;}
+.postMeta{flex:1;}
+.postMeta .name{font-size:14px;font-weight:600;cursor:pointer;}
+.postMeta .name .badge2{display:inline-block;background:var(--primary);color:#fff;font-size:9px;padding:1px 5px;border-radius:4px;margin-left:4px;font-weight:700;}
+.postMeta small{color:var(--text4);font-size:11px;}
+.postMenu{font-size:20px;color:var(--text3);cursor:pointer;padding:0 4px;}
+.postBody{padding:0 14px 8px;font-size:15px;line-height:1.6;color:var(--text2);}
+.postBody a{color:var(--primary);}
+.postImg{width:100%;display:block;max-height:400px;object-fit:cover;cursor:pointer;}
+.postVideo{width:100%;max-height:400px;background:#000;}
+.postStats{display:flex;justify-content:space-between;padding:8px 14px;color:var(--text4);font-size:12px;}
+.postDivider{height:0.5px;background:var(--border);margin:0 14px;}
+.postActions{display:flex;border-top:0.5px solid var(--border);}
+.postAction{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 0;cursor:pointer;font-size:13px;font-weight:500;color:var(--text3);border-radius:4px;}
+.postAction:hover{background:var(--bg2);}
+.postAction.liked{color:var(--orange);}
+.postAction.reacted{color:var(--primary);}
+
+/* ---- COMMENTS ---- */
+.commentsSection{padding:0 14px 10px;display:none;}
+.commentsSection.show{display:block;}
+.commentItem{display:flex;gap:8px;margin-bottom:8px;}
+.commentAvatar{width:30px;height:30px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;}
+.commentBubble{background:var(--bg2);border-radius:12px;padding:8px 12px;flex:1;}
+.commentBubble .cname{font-size:12px;font-weight:600;margin-bottom:2px;}
+.commentBubble .ctext{font-size:13px;color:var(--text2);}
+.commentInput{display:flex;gap:8px;align-items:center;margin-top:6px;}
+.commentInput input{flex:1;background:var(--bg2);border:none;border-radius:20px;padding:8px 14px;color:#fff;font-size:13px;}
+.commentInput button{background:var(--primary);border:none;color:var(--primary2);border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;}
+
+/* ---- REACT PICKER ---- */
+.reactPicker{display:none;position:absolute;background:var(--bg2);border:0.5px solid var(--border);border-radius:24px;padding:6px 10px;gap:8px;z-index:200;box-shadow:0 4px 20px rgba(0,0,0,0.5);}
+.reactPicker.show{display:flex;}
+.reactEmoji{font-size:22px;cursor:pointer;transition:transform 0.1s;}
+.reactEmoji:hover{transform:scale(1.4);}
+
+/* ---- BOTTOM NAV ---- */
+#bottomnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;display:flex;background:var(--bg);border-top:0.5px solid var(--border);z-index:100;}
+.navBtn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 0;cursor:pointer;position:relative;}
+.navBtn .navIco{font-size:22px;color:var(--text3);}
+.navBtn.active .navIco{color:var(--primary);}
+.navBtn .navLabel{font-size:9px;color:var(--text3);margin-top:2px;}
+.navBtn.active .navLabel{color:var(--primary);}
+
+/* ---- SCREENS ---- */
+.screen{display:none;padding:0 0 70px;}
+.screen.show{display:block;}
+.screenHead{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:0.5px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:99;}
+.screenHead h2{font-size:17px;font-weight:700;}
+.backBtn{font-size:22px;cursor:pointer;color:var(--text);}
+
+/* ---- PROFILE ---- */
+.coverPhoto{width:100%;height:160px;background:linear-gradient(135deg,var(--primary),var(--pink));position:relative;overflow:hidden;}
+.coverPhoto img{width:100%;height:100%;object-fit:cover;}
+.profileSection{padding:0 14px 16px;border-bottom:6px solid var(--bg3);}
+.profileAvatarWrap{margin-top:-40px;margin-bottom:8px;position:relative;display:inline-block;}
+.profileAvatarLg{width:80px;height:80px;border-radius:50%;border:3px solid var(--bg);background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:var(--primary2);overflow:hidden;}
+.profileAvatarLg img{width:100%;height:100%;object-fit:cover;}
+.profileName{font-size:20px;font-weight:800;margin-bottom:2px;}
+.profileBio{color:var(--text3);font-size:13px;margin-bottom:10px;}
+.profileStats{display:flex;gap:16px;margin-bottom:12px;}
+.profileStat{text-align:center;}
+.profileStat .num{font-size:16px;font-weight:700;color:var(--primary);}
+.profileStat .lbl{font-size:11px;color:var(--text3);}
+.profileBtns{display:flex;gap:8px;}
+.profileBtn{flex:1;padding:8px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;text-align:center;}
+.profileBtn.primary{background:var(--primary);color:var(--primary2);}
+.profileBtn.secondary{background:var(--bg3);color:var(--text);}
+
+/* ---- FRIEND LIST ---- */
+.friendItem{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:0.5px solid var(--border);cursor:pointer;}
+.friendItem:hover{background:var(--bg2);}
+.friendAvatar{width:44px;height:44px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;overflow:hidden;}
+.friendAvatar img{width:100%;height:100%;object-fit:cover;}
+.friendMeta{flex:1;}
+.friendMeta .fname{font-size:14px;font-weight:600;}
+.friendMeta small{color:var(--text4);font-size:12px;}
+.onlineDot{width:10px;height:10px;background:var(--green);border-radius:50%;border:2px solid var(--bg);flex-shrink:0;}
+
+/* ---- CHAT ---- */
+#chatListScreen .chatItem{display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;}
+#chatListScreen .chatItem:hover{background:var(--bg2);}
+.chatAvatar{width:48px;height:48px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:17px;position:relative;overflow:hidden;}
+.chatAvatar img{width:100%;height:100%;object-fit:cover;}
+.onlineIndicator{position:absolute;bottom:0;right:0;width:12px;height:12px;background:var(--green);border-radius:50%;border:2px solid var(--bg);}
+.chatMeta{flex:1;}
+.chatMeta .chatName{font-size:14px;font-weight:600;}
+.chatMeta .chatPreview{font-size:12px;color:var(--text3);margin-top:1px;}
+.chatMeta .chatTime{font-size:11px;color:var(--text4);}
+.unreadBadge{background:var(--primary);color:#fff;font-size:10px;padding:2px 6px;border-radius:10px;font-weight:700;}
+
+/* ---- CONVERSATION ---- */
+#conversationScreen{display:none;flex-direction:column;height:100vh;padding:0;}
+#conversationScreen.show{display:flex;}
+#convHead{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:0.5px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:99;}
+#convMessages{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:6px;padding-bottom:70px;}
+#convInput{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--bg);border-top:0.5px solid var(--border);z-index:99;}
+#convInput input{flex:1;background:var(--bg2);border:none;border-radius:20px;padding:10px 16px;color:#fff;font-size:14px;}
+#convInput button{background:var(--primary);border:none;color:var(--primary2);border-radius:50%;width:36px;height:36px;font-size:18px;cursor:pointer;flex-shrink:0;}
+.msgBubble{max-width:75%;padding:8px 12px;border-radius:18px;font-size:14px;line-height:1.5;}
+.msgBubble.me{background:var(--primary);color:var(--primary2);align-self:flex-end;border-bottom-right-radius:4px;}
+.msgBubble.them{background:var(--bg2);color:var(--text2);align-self:flex-start;border-bottom-left-radius:4px;}
+.msgBubble.them .sname{font-size:11px;color:var(--green);font-weight:600;margin-bottom:2px;}
+.seenText{font-size:10px;color:var(--text4);align-self:flex-end;}
+
+/* ---- NOTIF ---- */
+.notifItem{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:0.5px solid var(--border);cursor:pointer;}
+.notifItem.unread{background:var(--primary)11;}
+.notifAvatar{width:44px;height:44px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;position:relative;overflow:hidden;}
+.notifAvatar img{width:100%;height:100%;object-fit:cover;}
+.notifEmoji{position:absolute;bottom:-2px;right:-2px;font-size:14px;}
+.notifMeta p{font-size:13px;color:var(--text2);line-height:1.4;}
+.notifMeta small{font-size:11px;color:var(--text4);}
+
+/* ---- SEARCH ---- */
+#searchScreen .searchBar{padding:10px 14px;}
+#searchScreen .searchBar input{width:100%;background:var(--bg2);border:none;border-radius:10px;padding:10px 16px;color:#fff;font-size:14px;}
+.searchResult{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;border-bottom:0.5px solid var(--border);}
+.searchResult:hover{background:var(--bg2);}
+
+/* ---- COMPOSER SHEET ---- */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:none;align-items:flex-end;justify-content:center;z-index:300;}
+.overlay.show{display:flex;}
+.sheet{background:var(--bg);border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:16px;}
+.sheet.center{border-radius:16px;margin:16px;max-width:440px;}
+.sheetHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.sheetHead h3{font-size:16px;font-weight:700;}
+.sheetClose{font-size:22px;cursor:pointer;color:var(--text3);}
+.composerWho{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.composerWhoName{font-size:14px;font-weight:600;}
+.composerWhoArea{background:var(--bg3);border-radius:6px;padding:3px 10px;font-size:12px;color:var(--text3);cursor:pointer;}
+textarea{width:100%;background:transparent;border:none;color:#fff;font-size:16px;min-height:100px;resize:none;font-family:inherit;outline:none;}
+.compMediaPreview{border-radius:10px;overflow:hidden;margin-bottom:10px;position:relative;}
+.compMediaPreview img,.compMediaPreview video{width:100%;border-radius:10px;display:block;}
+.removeMedia{position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.7);border:none;color:#fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;}
+.compMediaBtns{display:flex;gap:8px;padding:10px 0;border-top:0.5px solid var(--border);margin-top:6px;}
+.compMediaBtn{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text3);cursor:pointer;padding:6px 10px;border-radius:8px;}
+.compMediaBtn:hover{background:var(--bg3);}
+.postBtn{background:var(--primary);color:var(--primary2);border:none;border-radius:10px;padding:10px 24px;font-size:14px;font-weight:700;cursor:pointer;float:right;}
+.postBtn:disabled{opacity:0.5;}
+
+/* ---- MARKETPLACE ---- */
+.marketGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px;}
+.marketCard{background:var(--bg2);border-radius:12px;overflow:hidden;cursor:pointer;}
+.marketCard img{width:100%;height:120px;object-fit:cover;display:block;}
+.marketInfo{padding:8px 10px;}
+.marketPrice{font-size:15px;font-weight:700;color:var(--green);}
+.marketTitle{font-size:13px;color:var(--text2);margin:2px 0;}
+.marketArea{font-size:11px;color:var(--text4);}
+.soldOverlay{position:absolute;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--red);font-size:14px;border-radius:12px;}
+
+/* ---- STORY VIEW ---- */
+#storyViewOverlay{position:fixed;inset:0;background:#000;z-index:500;display:none;flex-direction:column;}
+#storyViewOverlay.show{display:flex;}
+#storyImg{width:100%;flex:1;object-fit:contain;}
+#storyViewHead{display:flex;align-items:center;gap:10px;padding:14px;position:absolute;top:0;left:0;right:0;background:linear-gradient(to bottom,rgba(0,0,0,0.7),transparent);}
+#storyCloseBtn{position:absolute;top:14px;right:14px;font-size:24px;cursor:pointer;color:#fff;}
+
+/* ---- WELCOME ---- */
+#welcomeOverlay{position:fixed;inset:0;background:var(--bg);z-index:400;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:32px;}
+#welcomeOverlay.hide{display:none;}
+.welcomeLogo{font-size:48px;font-weight:900;color:var(--primary);margin-bottom:8px;}
+.welcomeSub{color:var(--text3);font-size:14px;margin-bottom:40px;text-align:center;}
+.welcomeForm input{width:100%;padding:14px;border-radius:12px;border:1px solid var(--border);background:var(--bg2);color:#fff;font-size:15px;margin-bottom:12px;}
+.welcomeForm button{width:100%;padding:14px;border-radius:12px;border:none;background:var(--primary);color:var(--primary2);font-size:16px;font-weight:700;cursor:pointer;}
+.welcomeSkip{color:var(--text4);font-size:13px;margin-top:14px;cursor:pointer;text-decoration:underline;}
+
+/* ---- SETTINGS ---- */
+.settingGroup{margin-bottom:16px;}
+.settingGroup h4{font-size:12px;color:var(--text3);padding:12px 14px 6px;text-transform:uppercase;letter-spacing:0.5px;}
+.settingRow{display:flex;justify-content:space-between;align-items:center;padding:14px;border-bottom:0.5px solid var(--border);cursor:pointer;}
+.settingRow .sLabel p{font-size:14px;font-weight:500;}
+.settingRow .sLabel small{font-size:12px;color:var(--text3);}
+.toggle{width:46px;height:26px;background:var(--bg3);border-radius:14px;position:relative;cursor:pointer;flex-shrink:0;transition:background 0.2s;}
+.toggle.on{background:var(--primary);}
+.toggleKnob{width:20px;height:20px;background:#fff;border-radius:50%;position:absolute;top:3px;left:3px;transition:left 0.2s;}
+.toggle.on .toggleKnob{left:23px;}
+
+/* ---- DOPAMINE ANIMATIONS ---- */
+@keyframes popIn{0%{transform:scale(0.5);opacity:0;}70%{transform:scale(1.2);}100%{transform:scale(1);opacity:1;}}
+@keyframes floatUp{0%{opacity:1;transform:translateY(0);}100%{opacity:0;transform:translateY(-60px);}}
+@keyframes pulseGlow{0%{box-shadow:0 0 0 0 rgba(127,119,221,0.4);}70%{box-shadow:0 0 0 10px rgba(127,119,221,0);}100%{box-shadow:0 0 0 0 rgba(127,119,221,0);}}
+@keyframes shake{0%,100%{transform:rotate(0);}25%{transform:rotate(-8deg);}75%{transform:rotate(8deg);}}
+@keyframes slideIn{from{transform:translateY(100%);opacity:0;}to{transform:translateY(0);opacity:1;}}
+@keyframes shine{0%{background-position:-200%;}100%{background-position:200%;}}
+.popIn{animation:popIn 0.3s ease;}
+.floatEmoji{position:fixed;font-size:28px;pointer-events:none;z-index:999;animation:floatUp 1s ease forwards;}
+.onlinePulse{animation:pulseGlow 2s infinite;}
+.shake{animation:shake 0.4s ease;}
+.slideInUp{animation:slideIn 0.3s ease;}
+
+/* ---- TRENDING BANNER ---- */
+.trendBanner{background:linear-gradient(90deg,#7F77DD22,#D4537E22);border:0.5px solid #7F77DD44;border-radius:12px;padding:10px 14px;margin:8px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;}
+.trendBanner .fire{font-size:22px;animation:shake 1s infinite;}
+.trendBanner .trendText{flex:1;}
+.trendBanner .trendText p{font-size:13px;font-weight:600;color:var(--text);}
+.trendBanner .trendText small{font-size:11px;color:var(--text3);}
+
+/* ---- ONLINE COUNT BAR ---- */
+.onlineBar{display:flex;align-items:center;gap:8px;padding:8px 14px;font-size:12px;color:var(--green);}
+.onlineDot{width:8px;height:8px;background:var(--green);border-radius:50%;animation:pulseGlow 1.5s infinite;}
+
+/* ---- VIEW COUNT ---- */
+.viewCount{font-size:11px;color:var(--text4);display:flex;align-items:center;gap:3px;}
+
+/* ---- PROFILE COMPLETENESS ---- */
+.profileComplete{background:var(--bg2);border-radius:12px;padding:12px 14px;margin:10px 14px;}
+.profileComplete p{font-size:13px;font-weight:600;margin-bottom:6px;}
+.completeBar{height:6px;background:var(--bg3);border-radius:4px;overflow:hidden;}
+.completeFill{height:100%;background:linear-gradient(90deg,var(--primary),var(--green));border-radius:4px;transition:width 0.5s ease;}
+.completeTasks{display:flex;flex-direction:column;gap:6px;margin-top:10px;}
+.completeTask{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text3);}
+.completeTask.done{color:var(--green);}
+.completeTask span{font-size:14px;}
+
+/* ---- STORY PROGRESS BAR ---- */
+.storyProgress{height:3px;background:rgba(255,255,255,0.3);border-radius:2px;margin:2px;}
+.storyProgressFill{height:100%;background:#fff;border-radius:2px;transition:width linear;}
+
+/* ---- FOMO NOTIFICATION ---- */
+.fomoBar{background:linear-gradient(90deg,var(--primary),var(--pink));padding:10px 14px;display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;}
+.fomoBar .fomoClose{margin-left:auto;font-size:16px;opacity:0.8;}
+
+/* ---- ONBOARDING CHECKLIST ---- */
+.onboardingCard{background:linear-gradient(135deg,var(--primary)22,var(--pink)22);border:0.5px solid var(--primary)44;border-radius:14px;margin:8px 14px;padding:14px;animation:slideIn 0.4s ease;}
+
+/* ---- REACTION ANIMATION ---- */
+.reactBtn{transition:transform 0.1s;}
+.reactBtn:active{transform:scale(0.85);}
+.likeCount{display:inline-block;transition:transform 0.2s;}
+.likeCount.bump{animation:popIn 0.3s ease;}
+
+/* ---- SHIMMER LOADING ---- */
+.shimmerPost{background:var(--bg2);border-radius:12px;margin:8px 14px;padding:16px;animation:shine 1.5s linear infinite;background:linear-gradient(90deg,var(--bg2) 25%,var(--bg3) 50%,var(--bg2) 75%);background-size:200%;}
+.shimmerLine{height:12px;background:var(--bg3);border-radius:6px;margin-bottom:8px;}
+.shimmerCircle{width:40px;height:40px;border-radius:50%;background:var(--bg3);}
+
+input:focus,textarea:focus{outline:none;}
+.btn{padding:10px 20px;border-radius:10px;border:none;font-size:14px;font-weight:600;cursor:pointer;}
+.btn.primary{background:var(--primary);color:var(--primary2);}
+.btn.outline{background:transparent;border:1px solid var(--border);color:var(--text);}
+.empty{text-align:center;color:var(--text4);padding:40px 20px;font-size:14px;}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--bg2);border:0.5px solid var(--border);padding:10px 20px;border-radius:20px;font-size:13px;z-index:999;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- WELCOME SCREEN -->
+  <div id="welcomeOverlay">
+    <div class="welcomeLogo">BrightMesh</div>
+    <div class="welcomeSub">তোমার এলাকার মানুষের সাথে connect হও</div>
+    <div class="welcomeForm" style="width:100%; max-width:340px;">
+      <input type="text" id="wName" placeholder="তোমার নাম" maxlength="30">
+      <input type="text" id="wArea" placeholder="তোমার এলাকা (যেমন Zindabazar, Sylhet)" maxlength="50">
+      <button onclick="startApp()">শুরু করো →</button>
+      <p class="welcomeSkip" onclick="skipWelcome()">এখন না, পরে সেট করব</p>
+    </div>
+  </div>
+
+  <!-- TOP BAR -->
+  <div id="topbar">
+    <div class="logo">BrightMesh</div>
+    <div class="topIcons">
+      <div class="iconCircle" onclick="goTab('search')">🔍</div>
+      <div class="iconCircle" onclick="goTab('chat')">💬<span class="badge" id="msgBadge" style="display:none;">0</span></div>
+      <div class="iconCircle" onclick="goTab('notif')">🔔<span class="badge" id="notifBadge" style="display:none;">0</span></div>
+    </div>
+  </div>
+
+  <!-- MAIN FEED SCREEN -->
+  <div id="homeScreen">
+    <!-- Stories -->
+    <div id="storiesWrap">
+      <div class="storyCard" onclick="triggerStoryUpload()">
+        <div class="storyRing add"><div class="storyAvatar" id="myStoryAvatar">+</div></div>
+        <div class="storyName">তোমার Story</div>
+      </div>
+      <div id="storiesList" style="display:contents;"></div>
+    </div>
+    <input type="file" id="storyFile" accept="image/*" style="display:none;" onchange="uploadStory(event)">
+
+    <!-- Composer Bar -->
+    <div id="composerBar">
+      <div class="composerAvatar" id="myAvatarMini">?</div>
+      <div class="composerInput" onclick="openComposer()">তোমার মনে কী চলছে?</div>
+    </div>
+    <div class="composerActions">
+      <div class="compAct" onclick="openComposer('video')">🎥 <span>Video</span></div>
+      <div class="compAct" onclick="openComposer('photo')">📷 <span>Photo</span></div>
+      <div class="compAct" onclick="openComposer('feel')">😊 <span>Feeling</span></div>
+    </div>
+
+    <!-- Feed Tabs -->
+    <div id="feedTabs">
+      <div class="feedTab active" onclick="switchFeedTab('all',this)">সব</div>
+      <div class="feedTab" onclick="switchFeedTab('friends',this)">Friends</div>
+      <div class="feedTab" onclick="switchFeedTab('local',this)">Local</div>
+      <div class="feedTab" onclick="switchFeedTab('market',this)">🛍️</div>
+    </div>
+
+    <div id="pullRefresh" style="text-align:center;padding:8px;color:var(--text4);font-size:12px;display:none;">🔄 রিফ্রেশ হচ্ছে...</div>
+
+    <!-- FOMO BAR -->
+    <div class="fomoBar" id="fomoBar" style="display:none;" onclick="this.style.display='none'">
+      <span class="onlineDot"></span>
+      <span id="fomoText">তোমার এলাকায় নতুন কিছু হচ্ছে!</span>
+      <span class="fomoClose">✕</span>
+    </div>
+
+    <!-- ONLINE BAR -->
+    <div class="onlineBar">
+      <span class="onlineDot"></span>
+      <span id="onlineCountEl">...</span> জন এখন তোমার এলাকায় active
+    </div>
+
+    <!-- TRENDING BANNER -->
+    <div class="trendBanner" id="trendBanner" style="display:none;" onclick="switchFeedTab('all',document.querySelector('.feedTab'))">
+      <span class="fire">🔥</span>
+      <div class="trendText">
+        <p id="trendText">Trending এলাকায়</p>
+        <small id="trendSub">সবচেয়ে বেশি react হওয়া পোস্ট</small>
+      </div>
+      <span style="color:var(--primary);">→</span>
+    </div>
+
+    <!-- ONBOARDING CHECKLIST -->
+    <div class="onboardingCard" id="onboardingCard">
+      <p style="font-size:14px;font-weight:700;margin-bottom:8px;">👋 BrightMesh-এ স্বাগতম!</p>
+      <div class="profileComplete" style="margin:0;padding:0;background:transparent;">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text3);margin-bottom:4px;">
+          <span>প্রোফাইল সম্পন্ন করো</span><span id="completePercent">0%</span>
+        </div>
+        <div class="completeBar"><div class="completeFill" id="completeFill" style="width:0%"></div></div>
+        <div class="completeTasks" id="completeTasks"></div>
+      </div>
+    </div>
+
+    <div id="feed"></div>
+  </div>
+
+  <!-- SEARCH SCREEN -->
+  <div class="screen" id="searchScreen">
+    <div class="searchBar"><input type="text" id="searchInput" placeholder="মানুষ, পোস্ট, এলাকা খুঁজুন..." oninput="doSearch()"></div>
+    <div id="searchResults"></div>
+  </div>
+
+  <!-- NOTIFICATIONS SCREEN -->
+  <div class="screen" id="notifScreen">
+    <div class="screenHead"><h2>🔔 Notifications</h2></div>
+    <div id="notifList"></div>
+  </div>
+
+  <!-- CHAT LIST SCREEN -->
+  <div class="screen" id="chatListScreen">
+    <div class="screenHead"><h2>💬 Messages</h2></div>
+    <div id="chatList"></div>
+  </div>
+
+  <!-- CONVERSATION SCREEN -->
+  <div id="conversationScreen">
+    <div id="convHead">
+      <div class="backBtn" onclick="goTab('chat')">←</div>
+      <div class="chatAvatar" id="convAvatar">?</div>
+      <div style="flex:1;">
+        <div id="convName" style="font-size:15px;font-weight:700;"></div>
+        <div id="convStatus" style="font-size:11px;color:var(--green);"></div>
+      </div>
+    </div>
+    <div id="convMessages"></div>
+    <div id="convInput">
+      <input type="text" id="convMsgInput" placeholder="মেসেজ লিখো..." onkeydown="if(event.key==='Enter')sendMsg()">
+      <button onclick="sendMsg()">➤</button>
+    </div>
+  </div>
+
+  <!-- PROFILE SCREEN -->
+  <div class="screen" id="profileScreen">
+    <!-- My Profile -->
+    <div id="myProfile">
+      <div class="coverPhoto" id="coverPhotoWrap" onclick="document.getElementById('coverInput').click()" style="cursor:pointer;">
+        <div id="coverImg" style="width:100%;height:100%;background:linear-gradient(135deg,var(--primary),var(--pink));"></div>
+      </div>
+      <input type="file" id="coverInput" accept="image/*" style="display:none;" onchange="uploadCover(event)">
+      <div class="profileSection">
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;">
+          <div class="profileAvatarWrap" onclick="document.getElementById('profilePicInput').click()" style="cursor:pointer;">
+            <div class="profileAvatarLg" id="profileAvatarLg">?</div>
+          </div>
+          <input type="file" id="profilePicInput" accept="image/*" style="display:none;" onchange="uploadProfilePic(event)">
+          <div style="display:flex;gap:8px;margin-bottom:8px;">
+            <button class="profileBtn secondary" onclick="openSheet('editProfileSheet')" style="flex:none;padding:8px 14px;">✏️ Edit</button>
+          </div>
+        </div>
+        <div class="profileName" id="profileNameEl">নাম</div>
+        <div class="profileBio" id="profileBioEl">এলাকা</div>
+        <div class="profileStats">
+          <div class="profileStat"><div class="num" id="pstatPosts">0</div><div class="lbl">Posts</div></div>
+          <div class="profileStat"><div class="num" id="pstatFriends">0</div><div class="lbl">Friends</div></div>
+          <div class="profileStat"><div class="num" id="pstatLikes">0</div><div class="lbl">Likes</div></div>
+        </div>
+      </div>
+      <div id="myPostsFeed" style="padding-bottom:70px;"></div>
+    </div>
+  </div>
+
+  <!-- MARKETPLACE SCREEN -->
+  <div class="screen" id="marketScreen">
+    <div class="screenHead" style="justify-content:space-between;">
+      <h2>🛍️ Marketplace</h2>
+      <button class="btn primary" onclick="openComposer('market')" style="padding:6px 14px;">+ বিক্রি করো</button>
+    </div>
+    <div style="display:flex;gap:8px;padding:10px 14px;overflow-x:auto;">
+      <div class="btn outline" onclick="filterMarket('all')" style="white-space:nowrap;padding:6px 14px;">সব</div>
+      <div class="btn outline" onclick="filterMarket('book')" style="white-space:nowrap;padding:6px 14px;">📚 বই</div>
+      <div class="btn outline" onclick="filterMarket('electronics')" style="white-space:nowrap;padding:6px 14px;">📱 ইলেকট্রনিক্স</div>
+      <div class="btn outline" onclick="filterMarket('clothes')" style="white-space:nowrap;padding:6px 14px;">👗 পোশাক</div>
+      <div class="btn outline" onclick="filterMarket('food')" style="white-space:nowrap;padding:6px 14px;">🍔 খাবার</div>
+    </div>
+    <div class="marketGrid" id="marketGrid"></div>
+  </div>
+
+  <!-- SETTINGS SCREEN -->
+  <div class="screen" id="settingsScreen">
+    <div class="screenHead"><h2>⚙️ Settings</h2></div>
+    <div class="settingGroup">
+      <h4>Account</h4>
+      <div class="settingRow" onclick="openSheet('editProfileSheet')">
+        <div class="sLabel"><p>👤 প্রোফাইল এডিট</p><small>নাম, এলাকা, বায়ো পরিবর্তন</small></div>
+        <span>›</span>
+      </div>
+      <div class="settingRow" onclick="openSheet('changePassSheet')">
+        <div class="sLabel"><p>🔒 পাসওয়ার্ড পরিবর্তন</p></div>
+        <span>›</span>
+      </div>
+    </div>
+    <div class="settingGroup">
+      <h4>Preferences</h4>
+      <div class="settingRow">
+        <div class="sLabel"><p>🔔 Notifications</p></div>
+        <div class="toggle on" onclick="this.classList.toggle('on')"><div class="toggleKnob"></div></div>
+      </div>
+      <div class="settingRow">
+        <div class="sLabel"><p>📶 Data Saver</p><small>কম ডেটায় ছবি লোড</small></div>
+        <div class="toggle" id="dataSaverToggle" onclick="this.classList.toggle('on')"><div class="toggleKnob"></div></div>
+      </div>
+    </div>
+    <div class="settingGroup">
+      <h4>Privacy</h4>
+      <div class="settingRow" onclick="showBlockList()">
+        <div class="sLabel"><p>🚫 Block List</p></div>
+        <span>›</span>
+      </div>
+    </div>
+    <div class="settingGroup">
+      <h4>Info</h4>
+      <div class="settingRow" onclick="alert('BrightMesh v2.0\nMade in Bangladesh ❤️')">
+        <div class="sLabel"><p>ℹ️ App সম্পর্কে</p><small>Version 2.0</small></div>
+        <span>›</span>
+      </div>
+    </div>
+    <div style="padding:14px;">
+      <button class="btn outline" style="width:100%;margin-bottom:10px;color:var(--red);border-color:var(--red);" onclick="confirmDeleteAccount()">🗑️ Account Delete</button>
+      <button class="btn outline" style="width:100%;" onclick="logout()">লগ আউট</button>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div id="bottomnav">
+    <div class="navBtn active" id="nav-home" onclick="goTab('home')">
+      <div class="navIco">🏠</div><div class="navLabel">Home</div>
+    </div>
+    <div class="navBtn" id="nav-market" onclick="goTab('market')">
+      <div class="navIco">🛍️</div><div class="navLabel">Market</div>
+    </div>
+    <div class="navBtn" id="nav-chat" onclick="goTab('chat')">
+      <div class="navIco">💬</div><div class="navLabel">Chat</div>
+    </div>
+    <div class="navBtn" id="nav-profile" onclick="goTab('profile')">
+      <div class="navIco">👤</div><div class="navLabel">Profile</div>
+    </div>
+    <div class="navBtn" id="nav-settings" onclick="goTab('settings')">
+      <div class="navIco">⚙️</div><div class="navLabel">Settings</div>
+    </div>
+  </div>
+
+  <!-- COMPOSER OVERLAY -->
+  <div class="overlay" id="composerOverlay">
+    <div class="sheet">
+      <div class="sheetHead">
+        <h3>নতুন পোস্ট</h3>
+        <div class="sheetClose" onclick="closeComposer()">✕</div>
+      </div>
+      <div class="composerWho">
+        <div class="composerAvatar" id="compAvatar" style="width:38px;height:38px;font-size:14px;">?</div>
+        <div>
+          <div class="composerWhoName" id="compName">নাম</div>
+          <div class="composerWhoArea" id="compArea">🌍 এলাকা</div>
+        </div>
+      </div>
+      <div id="compMediaPreview" class="compMediaPreview" style="display:none;">
+        <img id="compImgPreview" style="display:none;">
+        <video id="compVidPreview" controls style="display:none;"></video>
+        <button class="removeMedia" onclick="removeCompMedia()">✕</button>
+      </div>
+      <textarea id="postText" placeholder="কী ভাবছ?"></textarea>
+      <input type="text" id="compFeelingInput" placeholder="😊 তোমার অনুভূতি..." style="display:none;padding:8px 0;background:transparent;border:none;border-top:0.5px solid var(--border);width:100%;color:var(--text3);font-size:14px;margin-top:8px;">
+      <input type="number" id="compPriceInput" placeholder="💰 দাম (টাকা)" style="display:none;padding:8px 0;background:transparent;border:none;border-top:0.5px solid var(--border);width:100%;color:var(--text3);font-size:14px;margin-top:8px;">
+      <select id="compCategory" style="display:none;padding:8px 0;background:transparent;border:none;border-top:0.5px solid var(--border);width:100%;color:var(--text3);font-size:14px;margin-top:8px;">
+        <option value="book">📚 বই</option>
+        <option value="electronics">📱 ইলেকট্রনিক্স</option>
+        <option value="clothes">👗 পোশাক</option>
+        <option value="food">🍔 খাবার</option>
+        <option value="other">📦 অন্যান্য</option>
+      </select>
+      <div class="compMediaBtns">
+        <div class="compMediaBtn" onclick="document.getElementById('compImgInput').click()">📷 ছবি</div>
+        <div class="compMediaBtn" onclick="document.getElementById('compVidInput').click()">🎥 ভিডিও</div>
+        <div class="compMediaBtn" onclick="toggleFeelingInput()">😊 Feeling</div>
+        <button class="postBtn" id="postBtn" onclick="submitPost()">Post</button>
+      </div>
+      <input type="file" id="compImgInput" accept="image/*" style="display:none;" onchange="compMedia(event,'img')">
+      <input type="file" id="compVidInput" accept="video/*" style="display:none;" onchange="compMedia(event,'vid')">
+    </div>
+  </div>
+
+  <!-- EDIT PROFILE SHEET -->
+  <div class="overlay" id="editProfileSheet" style="align-items:center;">
+    <div class="sheet center">
+      <div class="sheetHead"><h3>প্রোফাইল এডিট</h3><div class="sheetClose" onclick="closeSheet('editProfileSheet')">✕</div></div>
+      <input type="text" id="epName" placeholder="নাম" style="width:100%;padding:12px;background:var(--bg2);border:none;border-radius:10px;color:#fff;font-size:14px;margin-bottom:10px;">
+      <input type="text" id="epArea" placeholder="এলাকা" style="width:100%;padding:12px;background:var(--bg2);border:none;border-radius:10px;color:#fff;font-size:14px;margin-bottom:10px;">
+      <input type="text" id="epBio" placeholder="বায়ো (ঐচ্ছিক)" style="width:100%;padding:12px;background:var(--bg2);border:none;border-radius:10px;color:#fff;font-size:14px;margin-bottom:14px;">
+      <button class="btn primary" style="width:100%;" onclick="saveProfile()">সেভ করুন</button>
+    </div>
+  </div>
+
+  <!-- REACT PICKER -->
+  <div class="reactPicker" id="reactPicker">
+    <span class="reactEmoji" onclick="addReact('👍')">👍</span>
+    <span class="reactEmoji" onclick="addReact('❤️')">❤️</span>
+    <span class="reactEmoji" onclick="addReact('😂')">😂</span>
+    <span class="reactEmoji" onclick="addReact('😮')">😮</span>
+    <span class="reactEmoji" onclick="addReact('😢')">😢</span>
+    <span class="reactEmoji" onclick="addReact('😡')">😡</span>
+  </div>
+
+  <!-- STORY VIEW -->
+  <div id="storyViewOverlay">
+    <div id="storyViewHead">
+      <div class="storyAvatar" id="svAvatar" style="width:36px;height:36px;font-size:13px;"></div>
+      <div>
+        <div id="svName" style="font-size:14px;font-weight:600;"></div>
+        <div style="font-size:11px;color:var(--text3);">24 ঘণ্টা</div>
+      </div>
+    </div>
+    <img id="storyImg" style="width:100%;flex:1;object-fit:contain;">
+    <div id="storyCloseBtn" onclick="closeStoryView()">✕</div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+
+<script>
+/* ============ FIREBASE CONFIG ============ */
+const firebaseConfig = {
+  apiKey: "AIzaSyBahvYk6mX9OXsNUI7Hj2a06lcJZtFFy2c",
+  authDomain: "brightmesh-f93b3.firebaseapp.com",
+  projectId: "brightmesh-f93b3",
+  storageBucket: "brightmesh-f93b3.firebasestorage.app",
+  messagingSenderId: "458385343749",
+  appId: "1:458385343749:web:ba0d5d8613e61b3e23e36c"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const storage = firebase.storage();
+
+/* ============ STATE ============ */
+let me = { name:'Guest', area:'এলাকা সেট করুন', bio:'', uid:'', photoURL:'', coverURL:'' };
+let allPosts = [];
+let friends = [];
+let blocked = JSON.parse(localStorage.getItem('bm_blocked')||'[]');
+let bookmarks = JSON.parse(localStorage.getItem('bm_bookmarks')||'[]');
+let notifications = JSON.parse(localStorage.getItem('bm_notifs')||'[]');
+let activeTab = 'home';
+let activeFeedTab = 'all';
+let compMediaFile = null;
+let compMediaType = null;
+let currentChatId = null;
+let chatUnsub = null;
+let reactingPostId = null;
+let marketFilter = 'all';
+
+/* ============ INIT ============ */
+window.addEventListener('DOMContentLoaded', ()=>{
+  const saved = localStorage.getItem('bm_me');
+  if(saved){
+    me = JSON.parse(saved);
+    document.getElementById('welcomeOverlay').classList.add('hide');
+    initMain();
+  } else {
+    document.getElementById('welcomeOverlay').classList.remove('hide');
+  }
+});
+
+function startApp(){
+  const name = document.getElementById('wName').value.trim() || 'Guest';
+  const area = document.getElementById('wArea').value.trim() || 'এলাকা সেট করুন';
+  me.name = name; me.area = area;
+  me.uid = 'bm_' + Math.random().toString(36).substring(2,12);
+  saveMe();
+  document.getElementById('welcomeOverlay').classList.add('hide');
+  initMain();
+}
+function skipWelcome(){
+  me.uid = 'bm_' + Math.random().toString(36).substring(2,12);
+  me.name = 'Guest'; me.area = 'এলাকা সেট করুন';
+  saveMe();
+  document.getElementById('welcomeOverlay').classList.add('hide');
+  initMain();
+}
+function saveMe(){ localStorage.setItem('bm_me', JSON.stringify(me)); }
+
+function initMain(){
+  applyMyAvatar();
+  showShimmer();
+  loadFeed();
+  loadStories();
+  loadChatList();
+  setupPullRefresh();
+  loadNotifications();
+  setupOnlinePresence();
+  requestNotifPermission();
+  updateProfileComplete();
+  // FOMO bar after 10 seconds
+  setTimeout(showFomoBar, 10000);
+  setInterval(showFomoBar, 120000);
+}
+
+/* ============ AVATAR HELPER ============ */
+function applyMyAvatar(){
+  const initials = me.name.substring(0,2).toUpperCase();
+  const color = strColor(me.name);
+  ['myAvatarMini','myStoryAvatar','compAvatar'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    if(me.photoURL){ el.innerHTML=`<img src="${me.photoURL}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`; }
+    else { el.textContent=initials; el.style.background=color+'33'; el.style.color=color; }
+  });
+  document.getElementById('compName').textContent = me.name;
+  document.getElementById('compArea').textContent = '🌍 ' + me.area;
+}
+
+/* ============ TAB NAVIGATION ============ */
+function goTab(tab){
+  activeTab = tab;
+  ['homeScreen','searchScreen','notifScreen','chatListScreen','profileScreen','marketScreen','settingsScreen'].forEach(s=>{
+    const el = document.getElementById(s);
+    if(el){ el.style.display='none'; el.classList.remove('show'); }
+  });
+  document.getElementById('conversationScreen').classList.remove('show');
+  ['home','market','chat','profile','settings'].forEach(n=>{
+    const el = document.getElementById('nav-'+n);
+    if(el) el.classList.remove('active');
+  });
+
+  if(tab==='home'){ document.getElementById('homeScreen').style.display='block'; document.getElementById('nav-home').classList.add('active'); }
+  else if(tab==='search'){ document.getElementById('searchScreen').style.display='block'; document.getElementById('searchScreen').classList.add('show'); setTimeout(()=>document.getElementById('searchInput').focus(),100); }
+  else if(tab==='notif'){ document.getElementById('notifScreen').style.display='block'; document.getElementById('notifScreen').classList.add('show'); document.getElementById('notifBadge').style.display='none'; renderNotifications(); }
+  else if(tab==='chat'){ document.getElementById('chatListScreen').style.display='block'; document.getElementById('chatListScreen').classList.add('show'); document.getElementById('nav-chat').classList.add('active'); loadChatList(); }
+  else if(tab==='profile'){ document.getElementById('profileScreen').style.display='block'; document.getElementById('profileScreen').classList.add('show'); document.getElementById('nav-profile').classList.add('active'); loadMyProfile(); }
+  else if(tab==='market'){ document.getElementById('marketScreen').style.display='block'; document.getElementById('marketScreen').classList.add('show'); document.getElementById('nav-market').classList.add('active'); loadMarket(); }
+  else if(tab==='settings'){ document.getElementById('settingsScreen').style.display='block'; document.getElementById('settingsScreen').classList.add('show'); document.getElementById('nav-settings').classList.add('active'); }
+  document.getElementById('bottomnav').style.display = (tab==='chat'&&currentChatId) ? 'none' : 'flex';
+}
+
+/* ============ FEED ============ */
+function switchFeedTab(tab, el){
+  activeFeedTab = tab;
+  document.querySelectorAll('.feedTab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  if(tab==='market'){ goTab('market'); return; }
+  renderFeed();
+}
+
+function loadFeed(){
+  db.collection('posts').orderBy('createdAt','desc').limit(60)
+    .onSnapshot(snap=>{
+      allPosts=[];
+      snap.forEach(d=>allPosts.push({id:d.id,...d.data()}));
+      renderFeed();
+      checkNewNotifs();
+    }, err=>{ document.getElementById('feed').innerHTML='<div class="empty">Firebase config ঠিক করো</div>'; });
+}
+
+function renderFeed(){
+  const feedEl = document.getElementById('feed');
+  let posts = allPosts.filter(p=>!blocked.includes(p.uid));
+  if(activeFeedTab==='friends') posts=posts.filter(p=>friends.includes(p.uid)||p.uid===me.uid);
+  if(activeFeedTab==='local') posts=posts.filter(p=>p.area===me.area);
+  if(!posts.length){ feedEl.innerHTML='<div class="empty">কোনো পোস্ট নেই। প্রথমটি তুমিই করো! ✨</div>'; return; }
+  feedEl.innerHTML = posts.map(p=>buildPost(p)).join('');
+  checkTrending();
+  updateProfileComplete();
+}
+
+function buildPost(p){
+  const isMe = p.uid === me.uid;
+  const color = strColor(p.name||'U');
+  const initials = (p.name||'U').substring(0,2).toUpperCase();
+  const avatarHtml = p.photoURL
+    ? `<img src="${escHtml(p.photoURL)}" style="width:100%;height:100%;object-fit:cover;">`
+    : initials;
+  const avatarBg = p.photoURL ? '' : `background:${color}33;color:${color};`;
+  const timeAgo = p.createdAt ? timeSince(p.createdAt.toDate()) : 'এখনই';
+  const likeCount = (p.likes||[]).length;
+  const commentCount = (p.comments||[]).length;
+  const myLike = (p.likes||[]).includes(me.uid);
+  const myReact = p.reacts && p.reacts[me.uid];
+  const saved = bookmarks.includes(p.id);
+  const reactCounts = p.reacts ? Object.values(p.reacts).reduce((acc,r)=>{acc[r]=(acc[r]||0)+1;return acc;},{}) : {};
+  const reactSummary = Object.entries(reactCounts).map(([e,c])=>`${e}${c}`).join(' ');
+  const badgeHtml = p.verified ? '<span class="badge2">✓</span>' : '';
+  const menuHtml = isMe
+    ? `<div class="postMenu" onclick="postMenu('${p.id}','mine')">⋮</div>`
+    : `<div class="postMenu" onclick="postMenu('${p.id}','other','${escHtml(p.uid)}','${escHtml(p.name||'')}')">⋮</div>`;
+  let mediaHtml = '';
+  if(p.imageUrl) mediaHtml=`<img class="postImg" src="${escHtml(p.imageUrl)}" onclick="viewImg('${escHtml(p.imageUrl)}')" loading="lazy">`;
+  if(p.videoUrl) mediaHtml=`<video class="postVideo" src="${escHtml(p.videoUrl)}" controls></video>`;
+  const feelingHtml = p.feeling ? `<span style="color:var(--text3);font-size:13px;"> — feeling ${escHtml(p.feeling)}</span>` : '';
+  const soldBadge = p.sold ? `<span style="background:var(--red);color:#fff;font-size:11px;padding:2px 8px;border-radius:6px;margin-left:8px;">বিক্রি হয়ে গেছে</span>` : '';
+  const hashText = formatText(p.text||'');
+
+  return `<div class="post" id="post-${p.id}">
+    <div class="postHead">
+      <div class="postAvatar" style="${avatarBg}" onclick="viewProfile('${p.uid}','${escHtml(p.name||'')}','${escHtml(p.area||'')}','${escHtml(p.photoURL||'')}',${isMe})">${avatarHtml}</div>
+      <div class="postMeta">
+        <div class="name" onclick="viewProfile('${p.uid}','${escHtml(p.name||'')}','${escHtml(p.area||'')}','${escHtml(p.photoURL||'')}',${isMe})">${escHtml(p.name||'User')}${badgeHtml}${feelingHtml}</div>
+        <small>📍 ${escHtml(p.area||'')} · ${timeAgo}${p.category?` · ${catEmoji(p.category)}`:''}${p.price?` · ৳${p.price}${soldBadge}`:''}</small>
+      </div>
+      ${menuHtml}
+    </div>
+    ${hashText ? `<div class="postBody">${hashText}</div>` : ''}
+    ${mediaHtml}
+    <div class="postStats">
+      <span>${reactSummary||''} ${likeCount>0?`<span id="lc-${p.id}" class="likeCount">${likeCount} react</span>`:'<span id="lc-'+p.id+'"></span>'}</span>
+      <span class="viewCount">👁️ ${p.views||Math.floor(Math.random()*50)+likeCount*3} · ${commentCount>0?commentCount+' comment':''}</span>
+    </div>
+    <div class="postDivider"></div>
+    <div class="postActions">
+      <div class="postAction ${myReact||myLike?'reacted':''}" onmousedown="holdReact('${p.id}')" onclick="quickLike('${p.id}',event)">${myReact||'👍'} ${myReact?myReact:'Like'}</div>
+      <div class="postAction" onclick="toggleComments('${p.id}')">💬 Comment</div>
+      <div class="postAction" onclick="sharePost('${p.id}','${escHtml(p.text||'')}')">🔗 Share</div>
+      <div class="postAction ${saved?'reacted':''}" onclick="toggleBookmark('${p.id}')">${saved?'🔖':'🔖'} ${saved?'Saved':'Save'}</div>
+    </div>
+    <div class="commentsSection" id="csec-${p.id}">
+      <div id="clist-${p.id}">${(p.comments||[]).map(c=>buildComment(c)).join('')}</div>
+      <div class="commentInput">
+        <div class="commentAvatar" style="background:${color}33;color:${color};">${initials}</div>
+        <input type="text" id="cinput-${p.id}" placeholder="মন্তব্য লিখো..." onkeydown="if(event.key==='Enter')addComment('${p.id}')">
+        <button onclick="addComment('${p.id}')">➤</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function buildComment(c){
+  const color = strColor(c.name||'U');
+  const initials = (c.name||'U').substring(0,2).toUpperCase();
+  const avatarHtml = c.photoURL ? `<img src="${escHtml(c.photoURL)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` : initials;
+  return `<div class="commentItem">
+    <div class="commentAvatar" style="background:${color}33;color:${color};">${avatarHtml}</div>
+    <div class="commentBubble">
+      <div class="cname">${escHtml(c.name||'User')}</div>
+      <div class="ctext">${escHtml(c.text||'')}</div>
+    </div>
+  </div>`;
+}
+
+function toggleComments(pid){
+  const sec = document.getElementById('csec-'+pid);
+  sec.classList.toggle('show');
+}
+
+function addComment(pid){
+  const input = document.getElementById('cinput-'+pid);
+  const text = input.value.trim();
+  if(!text) return;
+  const comment = { name:me.name, uid:me.uid, text, photoURL:me.photoURL||'', at:new Date().toISOString() };
+  db.collection('posts').doc(pid).update({
+    comments: firebase.firestore.FieldValue.arrayUnion(comment)
+  }).then(()=>{ input.value=''; });
+}
+
+/* ============ LIKES / REACTS ============ */
+let holdTimer = null;
+function holdReact(pid){
+  holdTimer = setTimeout(()=>{
+    reactingPostId = pid;
+    const postEl = document.getElementById('post-'+pid);
+    const rect = postEl.getBoundingClientRect();
+    const picker = document.getElementById('reactPicker');
+    picker.style.bottom = (window.innerHeight - rect.top + 8) + 'px';
+    picker.style.left = '14px';
+    picker.classList.add('show');
+    holdTimer = null;
+  }, 500);
+}
+function quickLike(pid, event){
+  if(holdTimer){ clearTimeout(holdTimer); holdTimer=null; }
+  const post = allPosts.find(p=>p.id===pid);
+  if(!post) return;
+  const likes = post.likes||[];
+  if(likes.includes(me.uid)){
+    db.collection('posts').doc(pid).update({ likes: firebase.firestore.FieldValue.arrayRemove(me.uid) });
+  } else {
+    db.collection('posts').doc(pid).update({ likes: firebase.firestore.FieldValue.arrayUnion(me.uid) });
+    addNotif(post.uid, `${me.name} তোমার পোস্টে like করেছে`);
+    // float emoji
+    if(event){
+      const el = document.createElement('div');
+      el.className='floatEmoji'; el.textContent='❤️';
+      el.style.left = (event.clientX-14)+'px';
+      el.style.top = (event.clientY-14)+'px';
+      document.body.appendChild(el);
+      setTimeout(()=>el.remove(), 1000);
+    }
+    // bump count
+    const lc = document.getElementById('lc-'+pid);
+    if(lc){ lc.classList.add('bump'); setTimeout(()=>lc.classList.remove('bump'),300); }
+  }
+}
+function addReact(emoji){
+  if(!reactingPostId) return;
+  const pid = reactingPostId;
+  db.collection('posts').doc(pid).update({ [`reacts.${me.uid}`]: emoji });
+  document.getElementById('reactPicker').classList.remove('show');
+  reactingPostId = null;
+}
+document.addEventListener('click', e=>{ if(!e.target.closest('#reactPicker')&&!e.target.closest('.postAction')) document.getElementById('reactPicker').classList.remove('show'); });
+
+/* ============ POST MENU ============ */
+function postMenu(pid, type, authorUid, authorName){
+  if(type==='mine'){
+    const choice = confirm('এই পোস্ট ডিলিট করবে?');
+    if(choice) db.collection('posts').doc(pid).delete().then(()=>showToast('পোস্ট ডিলিট হয়েছে'));
+  } else {
+    const choice = confirm(`"${authorName}" কে Block করবে?\n(Cancel = শুধু Report)`);
+    if(choice){
+      if(!blocked.includes(authorUid)) blocked.push(authorUid);
+      localStorage.setItem('bm_blocked', JSON.stringify(blocked));
+      showToast(`${authorName} কে Block করা হয়েছে`);
+      renderFeed();
+    } else { showToast('Report পাঠানো হয়েছে 🙏'); }
+  }
+}
+function markSold(pid){ db.collection('posts').doc(pid).update({sold:true}).then(()=>showToast('Sold মার্ক হয়েছে')); }
+
+/* ============ COMPOSER ============ */
+let compMode = '';
+function openComposer(mode=''){
+  compMode = mode;
+  document.getElementById('composerOverlay').classList.add('show');
+  document.getElementById('compFeelingInput').style.display='none';
+  document.getElementById('compPriceInput').style.display=(mode==='market')?'block':'none';
+  document.getElementById('compCategory').style.display=(mode==='market')?'block':'none';
+  if(mode==='photo') document.getElementById('compImgInput').click();
+  if(mode==='video') document.getElementById('compVidInput').click();
+  if(mode==='feel') document.getElementById('compFeelingInput').style.display='block';
+  applyMyAvatar();
+}
+function closeComposer(){
+  document.getElementById('composerOverlay').classList.remove('show');
+  document.getElementById('postText').value='';
+  compMediaFile=null; compMediaType=null;
+  document.getElementById('compMediaPreview').style.display='none';
+  document.getElementById('compImgPreview').style.display='none';
+  document.getElementById('compVidPreview').style.display='none';
+  document.getElementById('compFeelingInput').value='';
+  document.getElementById('compPriceInput').value='';
+}
+function compMedia(e, type){
+  const file = e.target.files[0];
+  if(!file) return;
+  const maxMB = type==='vid' ? 20 : 5;
+  if(file.size > maxMB*1024*1024){ alert(`Max ${maxMB}MB`); return; }
+  compMediaFile=file; compMediaType=type;
+  const url = URL.createObjectURL(file);
+  document.getElementById('compMediaPreview').style.display='block';
+  if(type==='img'){ document.getElementById('compImgPreview').src=url; document.getElementById('compImgPreview').style.display='block'; document.getElementById('compVidPreview').style.display='none'; }
+  else { document.getElementById('compVidPreview').src=url; document.getElementById('compVidPreview').style.display='block'; document.getElementById('compImgPreview').style.display='none'; }
+}
+function removeCompMedia(){ compMediaFile=null; compMediaType=null; document.getElementById('compMediaPreview').style.display='none'; }
+function toggleFeelingInput(){ const el=document.getElementById('compFeelingInput'); el.style.display=el.style.display==='none'?'block':'none'; }
+
+function submitPost(){
+  const text = document.getElementById('postText').value.trim();
+  const feeling = document.getElementById('compFeelingInput').value.trim();
+  const price = document.getElementById('compPriceInput').value.trim();
+  const category = document.getElementById('compCategory').value;
+  if(!text && !compMediaFile){ showToast('কিছু লিখো বা ছবি দাও'); return; }
+  document.getElementById('postBtn').disabled=true;
+
+  const postData = {
+    uid: me.uid, name: me.name, area: me.area, photoURL: me.photoURL||'',
+    text: text||'', feeling: feeling||'', likes:[], comments:[], reacts:{},
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+  if(compMode==='market'||price){ postData.price=price; postData.category=category; postData.sold=false; }
+
+  const doPost = () => db.collection('posts').add(postData).then(()=>{ closeComposer(); document.getElementById('postBtn').disabled=false; showToast('পোস্ট হয়েছে! ✅'); });
+
+  if(compMediaFile){
+    const path = (compMediaType==='img'?'images':'videos')+`/${me.uid}_${Date.now()}`;
+    showToast('আপলোড হচ্ছে...');
+    storage.ref(path).put(compMediaFile).then(s=>s.ref.getDownloadURL()).then(url=>{
+      if(compMediaType==='img') postData.imageUrl=url; else postData.videoUrl=url;
+      doPost();
+    }).catch(err=>{ showToast('সমস্যা: '+err.message); document.getElementById('postBtn').disabled=false; });
+  } else { doPost(); }
+}
+
+/* ============ STORIES ============ */
+function triggerStoryUpload(){ document.getElementById('storyFile').click(); }
+function uploadStory(e){
+  const file = e.target.files[0];
+  if(!file||file.size>700000){ showToast('ছবি খুব বড় (max 700KB)'); return; }
+  showToast('Story আপলোড হচ্ছে...');
+  const reader = new FileReader();
+  reader.onload = ev => {
+    db.collection('stories').add({
+      uid:me.uid, name:me.name, area:me.area, photoURL:me.photoURL||'',
+      image:ev.target.result, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(()=>showToast('Story পোস্ট হয়েছে ✅'));
+  };
+  reader.readAsDataURL(file);
+}
+
+function loadStories(){
+  db.collection('stories').orderBy('createdAt','desc').onSnapshot(snap=>{
+    const now = Date.now();
+    let html='';
+    const storyData={};
+    snap.forEach(d=>{
+      const s=d.data();
+      if(!s.createdAt) return;
+      if(now-s.createdAt.toDate().getTime()>24*3600*1000) return;
+      if(s.area!==me.area&&s.uid!==me.uid) return;
+      storyData[d.id]=s;
+      html+=`<div class="storyCard" onclick="viewStory('${d.id}')">
+        <div class="storyRing"><div class="storyAvatar">${s.photoURL?`<img src="${escHtml(s.photoURL)}">`:(s.name||'?').substring(0,2).toUpperCase()}</div></div>
+        <div class="storyName">${escHtml(s.name||'')}</div>
+      </div>`;
+    });
+    window._stories=storyData;
+    document.getElementById('storiesList').innerHTML=html;
+  });
+}
+
+function viewStory(id){
+  const s=window._stories&&window._stories[id];
+  if(!s) return;
+  document.getElementById('storyImg').src=s.image;
+  document.getElementById('svAvatar').textContent=(s.name||'?').substring(0,2).toUpperCase();
+  document.getElementById('svName').textContent=s.name||'';
+  document.getElementById('storyViewOverlay').classList.add('show');
+}
+function closeStoryView(){ document.getElementById('storyViewOverlay').classList.remove('show'); }
+
+/* ============ SEARCH ============ */
+function doSearch(){
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  const resultsEl = document.getElementById('searchResults');
+  if(!q){ resultsEl.innerHTML=''; return; }
+
+  const postResults = allPosts.filter(p=>(p.text||'').toLowerCase().includes(q)||(p.name||'').toLowerCase().includes(q)||(p.area||'').toLowerCase().includes(q));
+  if(!postResults.length){ resultsEl.innerHTML='<div class="empty">কিছু পাওয়া যায়নি</div>'; return; }
+  resultsEl.innerHTML = postResults.map(p=>`
+    <div class="searchResult" onclick="goTab('home')">
+      <div class="postAvatar" style="width:40px;height:40px;background:${strColor(p.name||'U')}33;color:${strColor(p.name||'U')};">${(p.name||'U').substring(0,2).toUpperCase()}</div>
+      <div>
+        <div style="font-size:14px;font-weight:600;">${escHtml(p.name||'')}</div>
+        <div style="font-size:12px;color:var(--text3);">${escHtml((p.text||'').substring(0,60))}${(p.text||'').length>60?'...':''}</div>
+      </div>
+    </div>`).join('');
+}
+
+/* ============ CHAT ============ */
+function chatId(a,b){ return [a,b].sort().join('__'); }
+function startChat(otherUid, otherName, otherPhoto){
+  const cid = chatId(me.uid, otherUid);
+  db.collection('chats').doc(cid).set({
+    users:[me.uid,otherUid], names:{[me.uid]:me.name,[otherUid]:otherName}, photos:{[me.uid]:me.photoURL||'',[otherUid]:otherPhoto||''}, lastMsg:'', lastAt:firebase.firestore.FieldValue.serverTimestamp()
+  },{merge:true}).then(()=>openConversation(cid,otherName,otherPhoto));
+}
+function loadChatList(){
+  db.collection('chats').where('users','array-contains',me.uid).orderBy('lastAt','desc')
+    .onSnapshot(snap=>{
+      let html=''; let unread=0;
+      snap.forEach(d=>{
+        const c=d.data();
+        const otherUid=c.users.find(u=>u!==me.uid);
+        const oName=(c.names&&c.names[otherUid])||'User';
+        const oPhoto=(c.photos&&c.photos[otherUid])||'';
+        const color=strColor(oName);
+        html+=`<div class="chatItem" onclick="openConversation('${d.id}','${escHtml(oName)}','${escHtml(oPhoto)}')">
+          <div class="chatAvatar" style="background:${color}33;color:${color};">${oPhoto?`<img src="${escHtml(oPhoto)}">`:(oName.substring(0,2).toUpperCase())}</div>
+          <div class="chatMeta">
+            <div class="chatName">${escHtml(oName)}</div>
+            <div class="chatPreview">${escHtml((c.lastMsg||'').substring(0,40))}</div>
+          </div>
+        </div>`;
+      });
+      document.getElementById('chatList').innerHTML=html||'<div class="empty">কোনো মেসেজ নেই</div>';
+      if(unread>0){ document.getElementById('msgBadge').style.display='flex'; document.getElementById('msgBadge').textContent=unread; }
+    });
+}
+
+function openConversation(cid, oName, oPhoto){
+  currentChatId=cid;
+  if(chatUnsub) chatUnsub();
+
+  document.getElementById('conversationScreen').classList.add('show');
+  document.getElementById('chatListScreen').style.display='none';
+  document.getElementById('bottomnav').style.display='none';
+  document.getElementById('convName').textContent=oName;
+  document.getElementById('convStatus').textContent='Online';
+  const color=strColor(oName);
+  const convAvatar=document.getElementById('convAvatar');
+  if(oPhoto){ convAvatar.innerHTML=`<img src="${escHtml(oPhoto)}" style="width:100%;height:100%;object-fit:cover;">`; }
+  else { convAvatar.textContent=oName.substring(0,2).toUpperCase(); convAvatar.style.background=color+'33'; convAvatar.style.color=color; }
+
+  chatUnsub = db.collection('chats').doc(cid).collection('messages').orderBy('createdAt','asc').limit(100)
+    .onSnapshot(snap=>{
+      const box=document.getElementById('convMessages');
+      box.innerHTML='';
+      snap.forEach(d=>{
+        const m=d.data();
+        const isMine=m.uid===me.uid;
+        box.innerHTML+=`<div class="msgBubble ${isMine?'me':'them'}">${escHtml(m.text)}</div>`;
+      });
+      box.scrollTop=box.scrollHeight;
+    });
+}
+
+function sendMsg(){
+  const input=document.getElementById('convMsgInput');
+  const text=input.value.trim();
+  if(!text||!currentChatId) return;
+  db.collection('chats').doc(currentChatId).collection('messages').add({
+    uid:me.uid, name:me.name, text, createdAt:firebase.firestore.FieldValue.serverTimestamp()
+  });
+  db.collection('chats').doc(currentChatId).update({ lastMsg:text, lastAt:firebase.firestore.FieldValue.serverTimestamp() });
+  input.value='';
+}
+
+/* ============ PROFILE ============ */
+function loadMyProfile(){
+  document.getElementById('profileNameEl').textContent=me.name;
+  document.getElementById('profileBioEl').textContent=(me.bio||'')||(me.area||'');
+  const lg=document.getElementById('profileAvatarLg');
+  if(me.photoURL){ lg.innerHTML=`<img src="${escHtml(me.photoURL)}">`; }
+  else { lg.textContent=me.name.substring(0,2).toUpperCase(); }
+  if(me.coverURL){ document.getElementById('coverImg').innerHTML=`<img src="${escHtml(me.coverURL)}" style="width:100%;height:100%;object-fit:cover;">`; }
+  const myPosts=allPosts.filter(p=>p.uid===me.uid);
+  document.getElementById('pstatPosts').textContent=myPosts.length;
+  document.getElementById('pstatFriends').textContent=friends.length;
+  document.getElementById('pstatLikes').textContent=myPosts.reduce((s,p)=>(s+(p.likes||[]).length),0);
+  document.getElementById('myPostsFeed').innerHTML=myPosts.length?myPosts.map(p=>buildPost(p)).join(''):'<div class="empty">এখনো কোনো পোস্ট নেই</div>';
+  document.getElementById('epName').value=me.name;
+  document.getElementById('epArea').value=me.area;
+  document.getElementById('epBio').value=me.bio||'';
+}
+
+function viewProfile(uid, name, area, photo, isMe){
+  if(isMe){ goTab('profile'); return; }
+  const color=strColor(name);
+  const avatarHtml=photo?`<img src="${escHtml(photo)}">`:(name.substring(0,2).toUpperCase());
+  const userPosts=allPosts.filter(p=>p.uid===uid);
+  const isFriend=friends.includes(uid);
+  document.getElementById('myProfile').innerHTML=`
+    <div class="coverPhoto"><div style="width:100%;height:100%;background:linear-gradient(135deg,${color},${color}88);"></div></div>
+    <div class="profileSection">
+      <div class="profileAvatarWrap"><div class="profileAvatarLg" style="${photo?'':'background:'+color+'33;color:'+color+';'}">${avatarHtml}</div></div>
+      <div class="profileName">${escHtml(name)}</div>
+      <div class="profileBio">${escHtml(area)}</div>
+      <div class="profileStats">
+        <div class="profileStat"><div class="num">${userPosts.length}</div><div class="lbl">Posts</div></div>
+        <div class="profileStat"><div class="num">${userPosts.reduce((s,p)=>(s+(p.likes||[]).length),0)}</div><div class="lbl">Likes</div></div>
+      </div>
+      <div class="profileBtns">
+        <button class="profileBtn ${isFriend?'secondary':'primary'}" onclick="toggleFriend('${uid}','${escHtml(name)}','${escHtml(photo)}')">${isFriend?'✓ Friend':'+ Add Friend'}</button>
+        <button class="profileBtn secondary" onclick="startChat('${uid}','${escHtml(name)}','${escHtml(photo)}');goTab('chat')">💬 Message</button>
+      </div>
+    </div>
+    <div>${userPosts.length?userPosts.map(p=>buildPost(p)).join(''):'<div class="empty">কোনো পোস্ট নেই</div>'}</div>`;
+  goTab('profile');
+}
+
+function toggleFriend(uid, name, photo){
+  const idx=friends.indexOf(uid);
+  if(idx>-1){ friends.splice(idx,1); showToast(`${name} কে unfriend করা হয়েছে`); }
+  else { friends.push(uid); showToast(`${name} কে friend করা হয়েছে`); addNotif(uid, `${me.name} তোমাকে friend request পাঠিয়েছে`); }
+  localStorage.setItem('bm_friends', JSON.stringify(friends));
+  viewProfile(uid,name,'',photo,false);
+}
+
+/* ============ PROFILE EDIT / UPLOAD ============ */
+function saveProfile(){
+  me.name=document.getElementById('epName').value.trim()||me.name;
+  me.area=document.getElementById('epArea').value.trim()||me.area;
+  me.bio=document.getElementById('epBio').value.trim();
+  saveMe(); applyMyAvatar(); closeSheet('editProfileSheet');
+  showToast('প্রোফাইল আপডেট হয়েছে ✅');
+  loadMyProfile();
+}
+function uploadProfilePic(e){
+  const file=e.target.files[0];
+  if(!file||file.size>2*1024*1024){ showToast('Max 2MB'); return; }
+  showToast('আপলোড হচ্ছে...');
+  storage.ref(`profiles/${me.uid}_${Date.now()}`).put(file).then(s=>s.ref.getDownloadURL()).then(url=>{ me.photoURL=url; saveMe(); applyMyAvatar(); loadMyProfile(); showToast('ছবি আপডেট হয়েছে ✅'); });
+}
+function uploadCover(e){
+  const file=e.target.files[0];
+  if(!file) return;
+  storage.ref(`covers/${me.uid}_${Date.now()}`).put(file).then(s=>s.ref.getDownloadURL()).then(url=>{ me.coverURL=url; saveMe(); loadMyProfile(); });
+}
+
+/* ============ MARKETPLACE ============ */
+function loadMarket(){
+  db.collection('posts').where('price','>','').orderBy('price','desc').onSnapshot(snap=>{
+    const posts=[];
+    snap.forEach(d=>posts.push({id:d.id,...d.data()}));
+    renderMarket(posts);
+  });
+}
+function filterMarket(cat){ marketFilter=cat; loadMarket(); }
+function renderMarket(posts){
+  let items=posts.filter(p=>!blocked.includes(p.uid));
+  if(marketFilter!=='all') items=items.filter(p=>p.category===marketFilter);
+  if(!items.length){ document.getElementById('marketGrid').innerHTML='<div class="empty" style="grid-column:1/-1;">কোনো item নেই</div>'; return; }
+  document.getElementById('marketGrid').innerHTML=items.map(p=>`
+    <div class="marketCard" style="position:relative;">
+      ${p.imageUrl?`<img src="${escHtml(p.imageUrl)}" onclick="viewImg('${escHtml(p.imageUrl)}')" loading="lazy">`:'<div style="height:120px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:32px;">${catEmoji(p.category||"other")}</div>'}
+      ${p.sold?`<div class="soldOverlay">SOLD</div>`:''}
+      <div class="marketInfo">
+        <div class="marketPrice">৳${p.price}</div>
+        <div class="marketTitle">${escHtml((p.text||'').substring(0,40))}</div>
+        <div class="marketArea">📍 ${escHtml(p.area||'')}</div>
+        <div style="display:flex;gap:6px;margin-top:6px;">
+          <button class="btn primary" style="flex:1;padding:6px;font-size:12px;" onclick="startChat('${p.uid}','${escHtml(p.name||'')}','');goTab('chat')">Message</button>
+          ${p.uid===me.uid&&!p.sold?`<button class="btn outline" style="flex:1;padding:6px;font-size:12px;" onclick="markSold('${p.id}')">Sold</button>`:''}
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+/* ============ NOTIFICATIONS ============ */
+function addNotif(toUid, msg){
+  const notif={toUid,msg,from:me.name,at:Date.now(),read:false};
+  db.collection('notifs').add(notif);
+}
+function loadNotifications(){
+  db.collection('notifs').where('toUid','==',me.uid).orderBy('at','desc').limit(30)
+    .onSnapshot(snap=>{
+      notifications=[];
+      snap.forEach(d=>notifications.push({id:d.id,...d.data()}));
+      renderNotifications();
+      const unread=notifications.filter(n=>!n.read).length;
+      if(unread>0){ document.getElementById('notifBadge').style.display='flex'; document.getElementById('notifBadge').textContent=unread; }
+    });
+}
+function renderNotifications(){
+  const el=document.getElementById('notifList');
+  if(!notifications.length){ el.innerHTML='<div class="empty">কোনো notification নেই</div>'; return; }
+  el.innerHTML=notifications.map(n=>`
+    <div class="notifItem ${n.read?'':'unread'}">
+      <div class="notifAvatar" style="background:${strColor(n.from||'U')}33;color:${strColor(n.from||'U')};">${(n.from||'U').substring(0,2).toUpperCase()}</div>
+      <div class="notifMeta"><p>${escHtml(n.msg||'')}</p><small>${timeSince(new Date(n.at))}</small></div>
+    </div>`).join('');
+  notifications.forEach(n=>{ if(!n.read){ db.collection('notifs').doc(n.id).update({read:true}); sendPushNotif('BrightMesh 🔔', n.msg||''); } });
+}
+function checkNewNotifs(){ /* handled by Firestore listener */ }
+
+/* ============ SHARE / BOOKMARK ============ */
+function sharePost(pid, text){
+  const shareText=(text||'').substring(0,100)+'\n\nBrightMesh-এ দেখো 👉 '+location.href;
+  if(navigator.share){ navigator.share({title:'BrightMesh',text:shareText}).catch(()=>{}); }
+  else { navigator.clipboard.writeText(shareText).then(()=>showToast('লিংক কপি হয়েছে 📋')); }
+}
+function toggleBookmark(pid){
+  const idx=bookmarks.indexOf(pid);
+  if(idx>-1){ bookmarks.splice(idx,1); showToast('Saved সরানো হয়েছে'); }
+  else { bookmarks.push(pid); showToast('Save হয়েছে 🔖'); }
+  localStorage.setItem('bm_bookmarks',JSON.stringify(bookmarks));
+  renderFeed();
+}
+
+/* ============ OVERLAY / SHEET ============ */
+function openSheet(id){ document.getElementById(id).classList.add('show'); }
+function closeSheet(id){ document.getElementById(id).classList.remove('show'); }
+function viewImg(url){ const overlay=document.createElement('div'); overlay.style.cssText='position:fixed;inset:0;background:#000;z-index:600;display:flex;align-items:center;justify-content:center;'; overlay.innerHTML=`<img src="${escHtml(url)}" style="max-width:100%;max-height:100%;"><div style="position:absolute;top:14px;right:14px;font-size:28px;cursor:pointer;color:#fff;" onclick="this.parentElement.remove()">✕</div>`; document.body.appendChild(overlay); }
+
+/* ============ LOGOUT / DELETE ============ */
+function logout(){ localStorage.removeItem('bm_me'); location.reload(); }
+function confirmDeleteAccount(){
+  if(confirm('সব data মুছে যাবে, নিশ্চিত?')){ localStorage.clear(); location.reload(); }
+}
+function showBlockList(){
+  alert(blocked.length?'Blocked: '+blocked.join('\n'):'কেউ blocked নেই');
+}
+
+/* ============ PULL TO REFRESH ============ */
+function setupPullRefresh(){
+  let startY=0;
+  const feed=document.getElementById('feed');
+  feed.addEventListener('touchstart',e=>{startY=e.touches[0].clientY;});
+  feed.addEventListener('touchend',e=>{
+    if(e.changedTouches[0].clientY-startY>80&&feed.scrollTop===0){
+      document.getElementById('pullRefresh').style.display='block';
+      setTimeout(()=>{ document.getElementById('pullRefresh').style.display='none'; showToast('আপডেট হয়েছে ✅'); },800);
+    }
+  });
+}
+
+/* ============ DOPAMINE FEATURES ============ */
+
+// 1. SHIMMER LOADING
+function showShimmer(){
+  document.getElementById('feed').innerHTML = Array(3).fill(`
+    <div class="shimmerPost">
+      <div style="display:flex;gap:10px;margin-bottom:12px;">
+        <div class="shimmerCircle"></div>
+        <div style="flex:1;"><div class="shimmerLine" style="width:60%;"></div><div class="shimmerLine" style="width:40%;"></div></div>
+      </div>
+      <div class="shimmerLine"></div><div class="shimmerLine" style="width:80%;"></div><div class="shimmerLine" style="width:60%;"></div>
+    </div>`).join('');
+}
+
+// 2. ONLINE PRESENCE
+function setupOnlinePresence(){
+  db.collection('presence').doc(me.uid).set({ area:me.area, name:me.name, lastSeen:firebase.firestore.FieldValue.serverTimestamp() });
+  setInterval(()=>db.collection('presence').doc(me.uid).update({ lastSeen:firebase.firestore.FieldValue.serverTimestamp() }), 60000);
+  db.collection('presence').where('area','==',me.area).onSnapshot(snap=>{
+    const now=Date.now(); let count=0;
+    snap.forEach(d=>{ const s=d.data(); if(s.lastSeen&&(now-s.lastSeen.toDate().getTime())<120000) count++; });
+    document.getElementById('onlineCountEl').textContent=Math.max(count,1);
+  });
+}
+
+// 3. TRENDING BANNER
+function checkTrending(){
+  if(!allPosts.length) return;
+  const topPost = [...allPosts].sort((a,b)=>((b.likes||[]).length+(b.comments||[]).length)-((a.likes||[]).length+(a.comments||[]).length))[0];
+  if(!topPost||(topPost.likes||[]).length<2) return;
+  const banner=document.getElementById('trendBanner');
+  document.getElementById('trendText').textContent=`🔥 "${(topPost.text||'').substring(0,30)}..." trending!`;
+  document.getElementById('trendSub').textContent=`${(topPost.likes||[]).length} react · ${(topPost.comments||[]).length} comment`;
+  banner.style.display='flex';
+}
+
+// 4. FOMO BAR
+function showFomoBar(){
+  const fomoTexts=[
+    `তোমার এলাকায় ${Math.floor(Math.random()*10)+3} টি নতুন পোস্ট হয়েছে!`,
+    `${Math.floor(Math.random()*5)+2} জন এইমাত্র Story দিয়েছে`,
+    `কেউ তোমার এলাকায় নতুন item বিক্রি করছে 🛍️`,
+    `তোমার এলাকায় নতুন Alert আছে ⚠️`
+  ];
+  document.getElementById('fomoText').textContent=fomoTexts[Math.floor(Math.random()*fomoTexts.length)];
+  document.getElementById('fomoBar').style.display='flex';
+  setTimeout(()=>{ if(document.getElementById('fomoBar')) document.getElementById('fomoBar').style.display='none'; }, 8000);
+}
+
+// 5. PROFILE COMPLETENESS
+function updateProfileComplete(){
+  const tasks=[
+    { label:'✏️ নাম সেট করো', done: me.name!=='Guest'&&me.name!=='' },
+    { label:'📍 এলাকা সেট করো', done: me.area!=='এলাকা সেট করুন' },
+    { label:'📸 প্রোফাইল ছবি দাও', done: !!me.photoURL },
+    { label:'📝 প্রথম পোস্ট করো', done: allPosts.some(p=>p.uid===me.uid) },
+    { label:'💬 কাউকে message করো', done: !!localStorage.getItem('bm_chatted') },
+  ];
+  const done=tasks.filter(t=>t.done).length;
+  const pct=Math.round((done/tasks.length)*100);
+  const el=document.getElementById('completePercent');
+  const fill=document.getElementById('completeFill');
+  const taskEl=document.getElementById('completeTasks');
+  if(el) el.textContent=pct+'%';
+  if(fill) fill.style.width=pct+'%';
+  if(taskEl) taskEl.innerHTML=tasks.map(t=>`<div class="completeTask ${t.done?'done':''}"><span>${t.done?'✅':'⬜'}</span>${t.label}</div>`).join('');
+  if(pct===100 && document.getElementById('onboardingCard')) document.getElementById('onboardingCard').style.display='none';
+}
+
+// 6. BROWSER PUSH NOTIFICATION
+function requestNotifPermission(){
+  if('Notification' in window && Notification.permission==='default'){
+    Notification.requestPermission().then(p=>{ if(p==='granted') showToast('Notification চালু হয়েছে 🔔'); });
+  }
+}
+function sendPushNotif(title, body){
+  if('Notification' in window && Notification.permission==='granted'){
+    new Notification(title, { body, icon:'/favicon.ico' });
+  }
+}
+
+/* ============ DOPAMINE FEATURES END ============ */
+function formatText(text){
+  return escHtml(text).replace(/#(\S+)/g,'<span style="color:var(--primary);cursor:pointer;" onclick="searchHash(\'$1\')">#$1</span>');
+}
+function searchHash(tag){ document.getElementById('searchInput').value='#'+tag; goTab('search'); doSearch(); }
+function catEmoji(cat){ const m={book:'📚',electronics:'📱',clothes:'👗',food:'🍔',other:'📦'}; return m[cat]||'📦'; }
+function escHtml(s){ if(!s) return ''; return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+function strColor(s){ const colors=['#7F77DD','#1D9E75','#D85A30','#D4537E','#378ADD','#BA7517','#9FE1CB','#FAC775']; let h=0; for(let i=0;i<s.length;i++) h=s.charCodeAt(i)+((h<<5)-h); return colors[Math.abs(h)%colors.length]; }
+function timeSince(date){ if(!date) return ''; const s=Math.floor((Date.now()-date.getTime())/1000); if(s<60) return 'এখনই'; if(s<3600) return Math.floor(s/60)+'m'; if(s<86400) return Math.floor(s/3600)+'h'; return Math.floor(s/86400)+'d'; }
+function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); }
+</script>
+</body>
+</html>
